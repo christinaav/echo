@@ -30,25 +30,32 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String temp;
+  String temp = "";
+  final mycontroller = TextEditingController();
+
+  void dispose() {
+    mycontroller.dispose();
+    super.dispose();
+    print(mycontroller);
+  }
 
   void connect() {
-    String indexRequest = 'GET / HTTP/1.1\nConnection: close\n\n';
-    setState(() {
-      Socket.connect("192.168.43.242", 3000).then((socket) {
-        /*print('*** Connected to: '
+    Socket.connect('192.168.43.242', 3000).then((socket) {
+      print('Connected to: '
           '${socket.remoteAddress.address}:${socket.remotePort}');
-*/
+    });
+  }
+
+  void send() {
+    Socket.connect('192.168.43.242', 3000).then((socket) {
+      setState(() {
         socket.listen((List<int> data) {
           // Uint8List
           print(String.fromCharCodes(data).trim());
           temp = String.fromCharCodes(data).trim();
-        }, onDone: () {
-          socket.destroy();
         });
-
         //Send the request
-        socket.write(indexRequest);
+        socket.write(mycontroller.text);
       });
     });
   }
@@ -70,11 +77,32 @@ class _MyHomePageState extends State<MyHomePage> {
               '$temp',
               style: Theme.of(context).textTheme.display1,
             ),
+            TextField(
+              controller: mycontroller,
+            ),
+            Row(
+              children: <Widget>[
+                FloatingActionButton(
+                  onPressed: send,
+                  child: Icon(Icons.cast_connected),
+                )
+              ],
+            )
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: connect,
+        onPressed: () {
+          connect();
+          /*return showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text(mycontroller.text),
+              );
+            },
+          );*/
+        },
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
