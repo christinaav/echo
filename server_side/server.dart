@@ -2,7 +2,7 @@ import 'dart:io';
 
 void main() {
   //ServerSocket.bind("192.168.43.242", 3000).then((ServerSocket server) {
-  ServerSocket.bind('192.168.43.242', 3000).then((ServerSocket server) {
+  ServerSocket.bind('192.168.1.90', 3000).then((ServerSocket server) {
     server.listen(handleClient);
   });
 }

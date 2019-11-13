@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'My echo'),
     );
   }
 }
@@ -40,23 +40,23 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void connect() {
-    Socket.connect('192.168.43.242', 3000).then((socket) {
+    Socket.connect('192.168.1.90', 3000).then((socket) {
       print('Connected to: '
           '${socket.remoteAddress.address}:${socket.remotePort}');
     });
   }
 
   void send() {
-    Socket.connect('192.168.43.242', 3000).then((socket) {
-      setState(() {
-        socket.listen((List<int> data) {
-          // Uint8List
+    Socket.connect('192.168.1.90', 3000).then((socket) {
+      socket.listen((List<int> data) {
+        // Uint8List
+        setState(() {
           print(String.fromCharCodes(data).trim());
           temp = String.fromCharCodes(data).trim();
         });
-        //Send the request
-        socket.write(mycontroller.text);
       });
+      //Send the request
+      socket.write(mycontroller.text);
     });
   }
 
