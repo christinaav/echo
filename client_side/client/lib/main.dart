@@ -58,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //Send the request
       socket.write(mycontroller.text);
     });
+    temp = "";
   }
 
   @override
@@ -66,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      backgroundColor: Colors.green[100],
+      backgroundColor: Colors.green[50],
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -105,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               style: new TextStyle(
                 fontFamily: "Poppins",
-                fontSize: 25.0,
+                fontSize: 22.0,
               ),
             ),
           ],
