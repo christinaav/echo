@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: MyHomePage(title: 'My echo'),
     );
@@ -40,14 +40,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void connect() {
-    Socket.connect('192.168.1.90', 3000).then((socket) {
+    Socket.connect('192.168.1.195', 3000).then((socket) {
       print('Connected to: '
           '${socket.remoteAddress.address}:${socket.remotePort}');
     });
   }
 
   void send() {
-    Socket.connect('192.168.1.90', 3000).then((socket) {
+    Socket.connect('192.168.1.195', 3000).then((socket) {
       socket.listen((List<int> data) {
         // Uint8List
         setState(() {
@@ -66,9 +66,12 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      backgroundColor: Colors.green[100],
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Text(
               'Server says:',
@@ -77,34 +80,36 @@ class _MyHomePageState extends State<MyHomePage> {
               '$temp',
               style: Theme.of(context).textTheme.display1,
             ),
-            TextField(
-              controller: mycontroller,
-            ),
             Row(
               children: <Widget>[
                 FloatingActionButton(
-                  onPressed: send,
-                  child: Icon(Icons.cast_connected),
+                  onPressed: connect,
+                  child: Icon(Icons.add),
                 )
               ],
-            )
+            ),
+            TextField(
+              controller: mycontroller,
+              decoration: new InputDecoration(
+                labelText: "Say something",
+                fillColor: Colors.white,
+                border: new OutlineInputBorder(
+                  borderRadius: new BorderRadius.circular(25.0),
+                  borderSide: new BorderSide(color: Colors.green),
+                ),
+                suffix: FloatingActionButton(
+                  child: Icon(Icons.send),
+                  backgroundColor: Colors.green,
+                  onPressed: send,
+                ),
+              ),
+              style: new TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 25.0,
+              ),
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          connect();
-          /*return showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                content: Text(mycontroller.text),
-              );
-            },
-          );*/
-        },
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
