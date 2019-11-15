@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.deepOrange,
       ),
       home: MyHomePage(title: 'My echo'),
     );
@@ -30,8 +30,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String temp = "";
+  String temp = '';
+  String state = '';
+  bool connected = false;
   final mycontroller = TextEditingController();
+  Socket socketino;
+
+  void connect() {
+    temp = 'You are online';
+    Socket.connect('192.168.1.195', 3000).then((socket) {
+      socketino = socket;
+      print('Connected to: '
+          '${socketino.remoteAddress.address}:${socketino.remotePort}');
+
+      socketino.listen((List<int> data) {
+        // Uint8List
+        setState(() {
+          print(String.fromCharCodes(data).trim());
+          temp = String.fromCharCodes(data).trim();
+        });
+      });
+    });
+
+    connected = true;
+  }
 
   void dispose() {
     mycontroller.dispose();
@@ -39,26 +61,17 @@ class _MyHomePageState extends State<MyHomePage> {
     print(mycontroller);
   }
 
-  void connect() {
-    Socket.connect('192.168.1.195', 3000).then((socket) {
-      print('Connected to: '
-          '${socket.remoteAddress.address}:${socket.remotePort}');
-    });
+  void quit() {
+    connected = false;
+    socketino.destroy();
+    temp = 'You are offline';
+    mycontroller.clear();
   }
 
   void send() {
-    Socket.connect('192.168.1.195', 3000).then((socket) {
-      socket.listen((List<int> data) {
-        // Uint8List
-        setState(() {
-          print(String.fromCharCodes(data).trim());
-          temp = String.fromCharCodes(data).trim();
-        });
-      });
-      //Send the request
-      socket.write(mycontroller.text);
-    });
-    temp = "";
+    socketino.write(mycontroller.text);
+    print(temp);
+    mycontroller.clear();
   }
 
   @override
@@ -66,8 +79,27 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: <Widget>[
+          Switch(
+            value: connected,
+            onChanged: (connected) {
+              setState(() {
+                print(connected);
+                if (connected) {
+                  connect();
+                  state = 'You echo is awake.';
+                } else {
+                  quit();
+                  state = 'Your echo is sleeping.';
+                }
+              });
+            },
+            activeTrackColor: Colors.white,
+            activeColor: Colors.teal,
+          ),
+        ],
       ),
-      backgroundColor: Colors.green[50],
+      backgroundColor: Colors.cyan[50],
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,19 +107,31 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Text(
-              'Server says:',
+              '$state',
+              style: TextStyle(
+                fontSize: 40.0,
+                color: Colors.cyan[800],
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              'Your echo says:',
+              style: TextStyle(
+                fontSize: 30.0,
+                color: Colors.grey[800],
+                fontWeight: FontWeight.w500,
+              ),
             ),
             Text(
               '$temp',
-              style: Theme.of(context).textTheme.display1,
+              style: TextStyle(
+                fontSize: 35.0,
+                color: Colors.cyan[800],
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            Row(
-              children: <Widget>[
-                FloatingActionButton(
-                  onPressed: connect,
-                  child: Icon(Icons.add),
-                )
-              ],
+            SizedBox(
+              height: 35,
             ),
             TextField(
               controller: mycontroller,
@@ -95,18 +139,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 labelText: "Say something",
                 fillColor: Colors.white,
                 border: new OutlineInputBorder(
-                  borderRadius: new BorderRadius.circular(25.0),
+                  borderRadius: new BorderRadius.circular(40.0),
                   borderSide: new BorderSide(color: Colors.green),
                 ),
                 suffix: FloatingActionButton(
                   child: Icon(Icons.send),
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.cyan[800],
                   onPressed: send,
                 ),
               ),
               style: new TextStyle(
                 fontFamily: "Poppins",
-                fontSize: 22.0,
+                fontSize: 23.0,
               ),
             ),
           ],
